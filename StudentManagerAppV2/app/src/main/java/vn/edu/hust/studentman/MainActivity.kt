@@ -1,14 +1,16 @@
 package vn.edu.hust.studentman
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
+import android.view.ContextMenu
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ListView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,84 +42,71 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    studentAdapter = StudentAdapter(students, ::editStudent, ::deleteStudent)
+    studentAdapter = StudentAdapter(this, students)
 
-    findViewById<RecyclerView>(R.id.recycler_view_students).apply {
-      adapter = studentAdapter
-      layoutManager = LinearLayoutManager(this@MainActivity)
-    }
-
-    findViewById<Button>(R.id.btn_add_new).setOnClickListener {
-      showAddStudentDialog()
-    }
+    val listView: ListView = findViewById<ListView>(R.id.list_view_students)
+    listView.adapter = studentAdapter
+    registerForContextMenu(listView)
   }
 
-  private fun showAddStudentDialog() {
-    val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_edit_student, null)
-    val editName = dialogView.findViewById<EditText>(R.id.edit_text_name)
-    val editId = dialogView.findViewById<EditText>(R.id.edit_text_id)
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    menuInflater.inflate(R.menu.main, menu)
+    return super.onCreateOptionsMenu(menu)
+  }
 
-    val dialog = AlertDialog.Builder(this)
-      .setTitle("Add New Student")
-      .setView(dialogView)
-      .setPositiveButton("Add") { _, _ ->
-        val name = editName.text.toString()
-        val id = editId.text.toString()
-        if (name.isNotEmpty() && id.isNotEmpty()) {
-          val newStudent = StudentModel(name, id)
-          students.add(newStudent)
-          studentAdapter.notifyItemInserted(students.size - 1)
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+      R.id.action_add_new -> {
+        val intent = Intent(this, AddEditStudentActivity::class.java)
+        val launcher = registerForActivityResult(
+          ActivityResultContracts.StartActivityForResult()
+        ) { it: ActivityResult ->
+          if (it.resultCode == RESULT_OK) {
+            val studentName = it.data!!.getStringExtra("studentName")!!
+            val studentId = it.data!!.getStringExtra("studentId")!!
+            students.add(StudentModel(studentName, studentId))
+            studentAdapter.notifyDataSetChanged()
+          }
         }
+        launcher.launch(intent)
       }
-      .setNegativeButton("Cancel", null)
-      .create()
-    dialog.show()
+    }
+    return super.onOptionsItemSelected(item)
   }
 
+  override fun onCreateContextMenu(
+    menu: ContextMenu?,
+    v: View?,
+    menuInfo: ContextMenu.ContextMenuInfo?
+  ) {
+    menuInflater.inflate(R.menu.context, menu)
+    super.onCreateContextMenu(menu, v, menuInfo)
+  }
 
-  private fun editStudent(position: Int) {
-    val student = students[position]
-    val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_edit_student, null)
-    val editName = dialogView.findViewById<EditText>(R.id.edit_text_name)
-    val editId = dialogView.findViewById<EditText>(R.id.edit_text_id)
-
-    editName.setText(student.studentName)
-    editId.setText(student.studentId)
-
-    val dialog = AlertDialog.Builder(this)
-      .setTitle("Edit Student")
-      .setView(dialogView)
-      .setPositiveButton("Save") { _, _ ->
-        val newName = editName.text.toString()
-        val newId = editId.text.toString()
-        if (newName.isNotEmpty() && newId.isNotEmpty()) {
-          students[position] = StudentModel(newName, newId)
-          studentAdapter.notifyItemChanged(position)
+  override fun onContextItemSelected(item: MenuItem): Boolean {
+    val pos = (item.menuInfo as AdapterView.AdapterContextMenuInfo).position
+    when (item.itemId) {
+      R.id.action_edit -> {
+        val intent = Intent(this, AddEditStudentActivity::class.java)
+        intent.putExtra("studentName", students[pos].studentName)
+        intent.putExtra("studentId", students[pos].studentId)
+        val launcher = registerForActivityResult(
+          ActivityResultContracts.StartActivityForResult()
+        ) { it: ActivityResult ->
+          if (it.resultCode == RESULT_OK) {
+            val studentName = it.data!!.getStringExtra("studentName")!!
+            val studentId = it.data!!.getStringExtra("studentId")!!
+            students[pos] = StudentModel(studentName, studentId)
+            studentAdapter.notifyDataSetChanged()
+          }
         }
+        launcher.launch(intent)
       }
-      .setNegativeButton("Cancel", null)
-      .create()
-    dialog.show()
-  }
-
-
-  private fun deleteStudent(position: Int) {
-    val deletedStudent = students[position]
-    val dialog = AlertDialog.Builder(this)
-      .setTitle("Confirm Delete")
-      .setMessage("Are you sure you want to delete ${deletedStudent.studentName}?")
-      .setPositiveButton("Yes") { _, _ ->
-        students.removeAt(position)
-        studentAdapter.notifyItemRemoved(position)
-
-        Snackbar.make(findViewById(R.id.recycler_view_students), "Student deleted", Snackbar.LENGTH_LONG)
-          .setAction("Undo") {
-            students.add(position, deletedStudent)
-            studentAdapter.notifyItemInserted(position)
-          }.show()
+      R.id.action_remove -> {
+        students.removeAt(pos)
+        studentAdapter.notifyDataSetChanged()
       }
-      .setNegativeButton("No", null)
-      .create()
-    dialog.show()
+    }
+    return super.onContextItemSelected(item)
   }
 }
