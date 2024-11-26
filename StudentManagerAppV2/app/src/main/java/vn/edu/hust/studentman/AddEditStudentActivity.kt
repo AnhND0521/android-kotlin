@@ -31,9 +31,9 @@ class AddEditStudentActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            intent.putExtra("studentName", editTextName.text)
-            intent.putExtra("studentId", editTextId.text)
-            setResult(RESULT_OK)
+            intent.putExtra("studentName", editTextName.text.toString())
+            intent.putExtra("studentId", editTextId.text.toString())
+            setResult(RESULT_OK, intent)
             finish()
         }
 

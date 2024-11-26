@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 
@@ -37,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     StudentModel("Lê Văn Vũ", "SV020")
   )
   private lateinit var studentAdapter: StudentAdapter
+  private lateinit var addNewLauncher: ActivityResultLauncher<Intent>
+  private lateinit var editLauncher: ActivityResultLauncher<Intent>
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -47,6 +50,27 @@ class MainActivity : AppCompatActivity() {
     val listView: ListView = findViewById<ListView>(R.id.list_view_students)
     listView.adapter = studentAdapter
     registerForContextMenu(listView)
+
+    addNewLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      if (result.resultCode == RESULT_OK) {
+        val studentName = result.data!!.getStringExtra("studentName")!!
+        val studentId = result.data!!.getStringExtra("studentId")!!
+        students.add(StudentModel(studentName, studentId))
+        studentAdapter.notifyDataSetChanged()
+      }
+    }
+
+    editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      if (result.resultCode == RESULT_OK) {
+        val studentName = result.data!!.getStringExtra("studentName")!!
+        val studentId = result.data!!.getStringExtra("studentId")!!
+        val pos = result.data!!.getIntExtra("position", -1)
+        if (pos != -1) {
+          students[pos] = StudentModel(studentName, studentId)
+          studentAdapter.notifyDataSetChanged()
+        }
+      }
+    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -58,17 +82,7 @@ class MainActivity : AppCompatActivity() {
     when (item.itemId) {
       R.id.action_add_new -> {
         val intent = Intent(this, AddEditStudentActivity::class.java)
-        val launcher = registerForActivityResult(
-          ActivityResultContracts.StartActivityForResult()
-        ) { it: ActivityResult ->
-          if (it.resultCode == RESULT_OK) {
-            val studentName = it.data!!.getStringExtra("studentName")!!
-            val studentId = it.data!!.getStringExtra("studentId")!!
-            students.add(StudentModel(studentName, studentId))
-            studentAdapter.notifyDataSetChanged()
-          }
-        }
-        launcher.launch(intent)
+        addNewLauncher.launch(intent)
       }
     }
     return super.onOptionsItemSelected(item)
@@ -90,17 +104,8 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, AddEditStudentActivity::class.java)
         intent.putExtra("studentName", students[pos].studentName)
         intent.putExtra("studentId", students[pos].studentId)
-        val launcher = registerForActivityResult(
-          ActivityResultContracts.StartActivityForResult()
-        ) { it: ActivityResult ->
-          if (it.resultCode == RESULT_OK) {
-            val studentName = it.data!!.getStringExtra("studentName")!!
-            val studentId = it.data!!.getStringExtra("studentId")!!
-            students[pos] = StudentModel(studentName, studentId)
-            studentAdapter.notifyDataSetChanged()
-          }
-        }
-        launcher.launch(intent)
+        intent.putExtra("position", pos)
+        editLauncher.launch(intent)
       }
       R.id.action_remove -> {
         students.removeAt(pos)
