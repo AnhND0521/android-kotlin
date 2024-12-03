@@ -17,33 +17,6 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-
-//    studentAdapter = StudentAdapter(this, students)
-//
-//    val listView: ListView = findViewById<ListView>(R.id.list_view_students)
-//    listView.adapter = studentAdapter
-//    registerForContextMenu(listView)
-//
-//    addNewLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//      if (result.resultCode == RESULT_OK) {
-//        val studentName = result.data!!.getStringExtra("studentName")!!
-//        val studentId = result.data!!.getStringExtra("studentId")!!
-//        students.add(StudentModel(studentName, studentId))
-//        studentAdapter.notifyDataSetChanged()
-//      }
-//    }
-//
-//    editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//      if (result.resultCode == RESULT_OK) {
-//        val studentName = result.data!!.getStringExtra("studentName")!!
-//        val studentId = result.data!!.getStringExtra("studentId")!!
-//        val pos = result.data!!.getIntExtra("position", -1)
-//        if (pos != -1) {
-//          students[pos] = StudentModel(studentName, studentId)
-//          studentAdapter.notifyDataSetChanged()
-//        }
-//      }
-//    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -52,12 +25,14 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//    when (item.itemId) {
-//      R.id.action_add_new -> {
-//        val intent = Intent(this, AddEditStudentActivity::class.java)
-//        addNewLauncher.launch(intent)
-//      }
-//    }
+    when (item.itemId) {
+      R.id.action_add_new -> {
+        supportFragmentManager.beginTransaction()
+          .replace(R.id.fragmentContainerView, StudentFormFragment())
+          .addToBackStack(null)
+          .commit();
+      }
+    }
     return super.onOptionsItemSelected(item)
   }
 }
