@@ -1,7 +1,6 @@
 package vn.edu.hust.studentman
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,12 +36,14 @@ class StudentFormFragment : Fragment() {
 
         view.findViewById<Button>(R.id.button_ok).setOnClickListener {
             if (editTextName.text.toString().isBlank()) {
-                Toast.makeText(requireContext(), "Please enter student name!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Please enter student name!", Toast.LENGTH_LONG)
+                    .show()
                 return@setOnClickListener
             }
 
             if (editTextId.text.toString().isBlank()) {
-                Toast.makeText(requireContext(), "Please enter student ID!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Please enter student ID!", Toast.LENGTH_LONG)
+                    .show()
                 return@setOnClickListener
             }
 
@@ -50,7 +51,10 @@ class StudentFormFragment : Fragment() {
             args.putString("studentName", editTextName.text.toString())
             args.putString("studentId", editTextId.text.toString())
             args.putInt("position", pos)
-            findNavController().navigate(R.id.action_studentFormFragment_to_studentListFragment, args)
+            findNavController().navigate(
+                R.id.action_studentFormFragment_to_studentListFragment,
+                args
+            )
         }
 
         view.findViewById<Button>(R.id.button_cancel).setOnClickListener {

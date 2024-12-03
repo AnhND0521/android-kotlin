@@ -1,15 +1,18 @@
 package vn.edu.hust.studentman
 
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextMenu
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 
 class StudentListFragment : Fragment() {
@@ -46,6 +49,27 @@ class StudentListFragment : Fragment() {
         listView.adapter = studentAdapter
         registerForContextMenu(listView)
 
+        requireActivity().addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.main, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    when (menuItem.itemId) {
+                        R.id.action_add_new -> {
+                            findNavController().navigate(R.id.action_studentListFragment_to_studentFormFragment)
+                            return true
+                        }
+
+                        else -> return false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+
         return view
     }
 
@@ -80,6 +104,7 @@ class StudentListFragment : Fragment() {
         return super.onContextItemSelected(item)
     }
 
+
     companion object {
         private val students = mutableListOf(
             StudentModel("Nguyễn Văn An", "SV001"),
@@ -103,21 +128,5 @@ class StudentListFragment : Fragment() {
             StudentModel("Phạm Thị Tuyết", "SV019"),
             StudentModel("Lê Văn Vũ", "SV020")
         )
-
-//        @JvmStatic
-//        fun newInstance(studentName: String, studentId: String, pos: Int = -1): StudentListFragment {
-//            val student = StudentModel(studentName, studentId)
-//            if (pos >= 0) {
-//                students[pos] = student
-//            } else {
-//                students.add(student)
-//            }
-//
-//            val instance = StudentListFragment()
-//            instance.apply {
-//                studentList = students
-//            }
-//            return instance
-//        }
     }
 }
