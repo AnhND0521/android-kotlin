@@ -8,25 +8,25 @@
 ## Ảnh chụp kết quả chạy thử
 ### Danh sách sinh viên
 <div>
-<img src="screenshots/screenshot1.png" title="Student Manager" width="1080"/>
+<img src="screenshots/screenshot1.png" title="Student Manager" width="320"/>
 </div>
 
 ### Tìm kiếm sinh viên
 <div>
-<img src="screenshots/screenshot2.png" title="Student Manager" width="1080"/>
+<img src="screenshots/screenshot2.png" title="Student Manager" width="320"/>
 </div>
 
 ### Thêm mới sinh viên
 <div>
-<img src="screenshots/screenshot3.png" title="Student Manager" width="1080"/>
+<img src="screenshots/screenshot3.png" title="Student Manager" width="320"/>
 </div>
 
 ### Chọn nhiều sinh viên để xóa
 <div>
-<img src="screenshots/screenshot4.png" title="Student Manager" width="1080"/>
+<img src="screenshots/screenshot4.png" title="Student Manager" width="320"/>
 </div>
 
 ### Xem chi tiết sinh viên
 <div>
-<img src="screenshots/screenshot5.png" title="Student Manager" width="1080"/>
+<img src="screenshots/screenshot5.png" title="Student Manager" width="320"/>
 </div>
